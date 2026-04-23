@@ -5,5 +5,5 @@ mv eneva_agk_dashboard.html index.html
 git add index.html
 git commit -m "feat: ENEVA AGK financial dashboard"
 git branch -M main
-git remote add origin https://github.com/SEU_USUARIO/eneva-agk-dashboard.git
+git remote add origin [https://github.com/SEU_USUARIO/eneva-agk-dashboard.git](https://github.com/GustavoCavalheiro1/Challange-Gallapagos-Investimentos)
 git push -u origin main
