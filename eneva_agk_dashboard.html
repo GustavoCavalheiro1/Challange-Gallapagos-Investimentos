@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENEVA S.A. | AGK Research — Galapagos Challenge</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg0: #07090c;
+    --bg1: #0c0f14;
+    --bg2: #111520;
+    --bg3: #161b26;
+    --border: #1d2535;
+    --border2: #252e40;
+    --text1: #e2e8f0;
+    --text2: #8896a8;
+    --text3: #4a5568;
+    --blue: #3b82f6;
+    --blue-dim: #1e3a5f;
+    --green: #10b981;
+    --green-dim: #064e3b;
+    --red: #ef4444;
+    --red-dim: #450a0a;
+    --amber: #f59e0b;
+    --amber-dim: #451a03;
+    --teal: #06b6d4;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  html { background: var(--bg0); color: var(--text1); font-family: var(--sans); font-size: 13px; }
+  body { min-height: 100vh; }
+
+  /* ─── TOP NAV ─── */
+  .topnav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 24px;
+    background: var(--bg1);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--text1); letter-spacing: .04em; }
+  .nav-brand span { color: var(--blue); }
+  .nav-ticker { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+  .nav-tabs { display: flex; gap: 2px; }
+  .nav-tab {
+    font-family: var(--mono); font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .08em;
+    padding: 5px 14px; border-radius: 3px; cursor: pointer;
+    color: var(--text3); border: 1px solid transparent;
+    transition: all .15s;
+  }
+  .nav-tab:hover { color: var(--text2); border-color: var(--border2); }
+  .nav-tab.active { background: var(--blue-dim); color: var(--blue); border-color: var(--blue); }
+  .nav-meta { font-family: var(--mono); font-size: 10px; color: var(--text3); text-align: right; line-height: 1.7; }
+  .dot-live { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; margin-right: 4px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ─── LAYOUT ─── */
+  .shell { max-width: 1440px; margin: 0 auto; padding: 20px 24px 40px; }
+
+  /* ─── SECTION HEADER ─── */
+  .sec-hdr {
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .15em;
+    color: var(--blue); padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px; margin-top: 24px;
+  }
+
+  /* ─── KPI STRIP ─── */
+  .kpi-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 24px; }
+  .kpi {
+    background: var(--bg1); border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px 16px;
+    position: relative; overflow: hidden;
+  }
+  .kpi::before { content:''; position: absolute; top:0; left:0; width:2px; height:100%; background: var(--blue); }
+  .kpi.green::before { background: var(--green); }
+  .kpi.red::before   { background: var(--red); }
+  .kpi.amber::before { background: var(--amber); }
+  .kpi.teal::before  { background: var(--teal); }
+  .kpi-lbl { font-family: var(--mono); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); margin-bottom: 5px; }
+  .kpi-val { font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--text1); letter-spacing: -.01em; }
+  .kpi-sub { font-family: var(--mono); font-size: 10px; margin-top: 4px; color: var(--green); }
+  .kpi-sub.neg { color: var(--red); }
+  .kpi-sub.neu { color: var(--text3); }
+
+  /* ─── GRID HELPERS ─── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .g21 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .g12 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--bg1); border: 1px solid var(--border);
+    border-radius: 4px; padding: 16px;
+  }
+  .card-title {
+    font-family: var(--mono); font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .12em;
+    color: var(--text3); margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ─── TABLE ─── */
+  table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 11px; }
+  thead th {
+    background: var(--bg2); color: var(--text3);
+    font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em;
+    padding: 7px 10px; border-bottom: 1px solid var(--border);
+    text-align: right; white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  tbody td {
+    padding: 6px 10px; border-bottom: 1px solid #0e1219;
+    color: var(--text2); text-align: right; white-space: nowrap;
+  }
+  tbody td:first-child { text-align: left; color: var(--text1); }
+  tbody tr:hover td { background: #0f1520; }
+  .pos { color: var(--green) !important; }
+  .neg { color: var(--red) !important; }
+  .neu { color: var(--amber) !important; }
+  .foot td { border-top: 1px solid var(--blue); color: var(--text1) !important; font-weight: 600; background: var(--bg2); }
+
+  /* ─── CHIP ─── */
+  .chip {
+    display: inline-block; font-family: var(--mono); font-size: 9px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 2px;
+  }
+  .chip-g { background: var(--green-dim); color: var(--green); border: 1px solid #065f46; }
+  .chip-r { background: var(--red-dim);   color: var(--red);   border: 1px solid #7f1d1d; }
+  .chip-b { background: var(--blue-dim);  color: var(--blue);  border: 1px solid #1e40af; }
+  .chip-a { background: var(--amber-dim); color: var(--amber); border: 1px solid #78350f; }
+
+  /* ─── WACC TABLE ─── */
+  .wacc-tbl { width: 100%; }
+  .wacc-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #0e1219; }
+  .wacc-row:last-child { border-bottom: none; }
+  .wacc-key { font-family: var(--mono); font-size: 10px; color: var(--text2); }
+  .wacc-val { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--text1); }
+  .wacc-desc { font-family: var(--mono); font-size: 9px; color: var(--text3); flex: 1; text-align: right; margin-right: 16px; }
+
+  /* ─── STRESS TABLE ─── */
+  .stress-grid { display: grid; grid-template-columns: auto repeat(5,1fr); gap: 0; }
+  .sg-cell {
+    font-family: var(--mono); font-size: 10px;
+    padding: 6px 10px; border: 1px solid var(--border);
+    text-align: center; color: var(--text2);
+  }
+  .sg-cell.hdr { background: var(--bg2); color: var(--text3); font-size: 9px; text-transform: uppercase; letter-spacing: .06em; }
+  .sg-cell.row-hdr { text-align: left; color: var(--text2); background: var(--bg2); }
+  .sg-cell.target { background: #172554; color: #93c5fd; font-weight: 600; }
+  .sg-cell.stress { background: var(--red-dim); color: #fca5a5; }
+
+  /* ─── RISK MATRIX ─── */
+  .risk-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .risk-item:last-child { border-bottom: none; }
+  .risk-icon { width: 28px; height: 28px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+  .risk-icon.hi { background: var(--red-dim); }
+  .risk-icon.med { background: var(--amber-dim); }
+  .risk-body {}
+  .risk-title { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--text1); margin-bottom: 3px; }
+  .risk-desc { font-size: 10px; color: var(--text3); line-height: 1.5; }
+
+  /* ─── PAGES ─── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ─── CHART CANVAS ─── */
+  .chart-wrap { position: relative; }
+
+  /* ─── FOOTNOTE ─── */
+  .footnote { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 8px; }
+
+  /* ─── VALUATION BOX ─── */
+  .val-box {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 4px; padding: 14px 18px;
+  }
+  .val-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); margin-bottom: 4px; }
+  .val-num { font-family: var(--mono); font-size: 20px; font-weight: 600; color: var(--text1); }
+  .val-sub { font-family: var(--mono); font-size: 10px; color: var(--text3); margin-top: 3px; }
+  .upside { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--green); }
+
+  /* ─── BRIDGE ROW ─── */
+  .br-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #0e1219; }
+  .br-key { font-family: var(--mono); font-size: 10px; color: var(--text2); }
+  .br-val { font-family: var(--mono); font-size: 11px; font-weight: 500; }
+
+  .section-divider { height: 1px; background: var(--border); margin: 28px 0 0; }
+
+  /* responsive */
+  @media (max-width: 900px) {
+    .kpi-strip { grid-template-columns: repeat(3,1fr); }
+    .g2,.g3,.g21,.g12 { grid-template-columns: 1fr; }
+    .kpi-val { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ TOPNAV ══ -->
+<nav class="topnav">
+  <div style="display:flex;align-items:center;gap:20px">
+    <div class="nav-brand">AGK<span>Research</span></div>
+    <div class="nav-ticker">ENEV3 · BM&FBOVESPA · R$ MM</div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchPage('overview',this)">Overview</div>
+    <div class="nav-tab" onclick="switchPage('cashflow',this)">Cash Flow</div>
+    <div class="nav-tab" onclick="switchPage('valuation',this)">Valuation</div>
+    <div class="nav-tab" onclick="switchPage('risco',this)">Riscos</div>
+    <div class="nav-tab" onclick="switchPage('debenture',this)">Debenture</div>
+  </div>
+  <div class="nav-meta">
+    <span class="dot-live"></span>Galapagos Challenge · Grupo AGK<br>
+    Adrian · Gustavo · Kauê
+  </div>
+</nav>
+
+<div class="shell">
+
+<!-- ══════════════════════════════════════════════
+     PAGE 1 — OVERVIEW
+══════════════════════════════════════════════ -->
+<div id="page-overview" class="page active">
+
+  <div class="sec-hdr">ENEVA S.A. — Visão Geral do Modelo de Negócio · 2021–2030E</div>
+
+  <!-- KPIs -->
+  <div class="kpi-strip">
+    <div class="kpi blue">
+      <div class="kpi-lbl">Receita Líquida 2030E</div>
+      <div class="kpi-val">R$8,9bi</div>
+      <div class="kpi-sub">+11x vs 2021 (R$759mm)</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-lbl">EBITDA 2030E</div>
+      <div class="kpi-val">R$2,25bi</div>
+      <div class="kpi-sub">+5,1x vs 2021 (R$442mm)</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-lbl">Margem EBITDA 2030E</div>
+      <div class="kpi-val">25,3%</div>
+      <div class="kpi-sub neg">vs 58,2% em 2021</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-lbl">Capacidade Instalada</div>
+      <div class="kpi-val">~7,2GW</div>
+      <div class="kpi-sub neu">Predominância gás natural</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-lbl">Preço-Alvo Implícito</div>
+      <div class="kpi-val">R$39,20</div>
+      <div class="kpi-sub">Upside +43,7%</div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="g21" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">Receita Líquida & EBITDA (R$ MM)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartRevEbitda"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Margem EBITDA (%)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartMargin"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- P&L Table -->
+  <div class="card">
+    <div class="card-title">Demonstrativo de Resultados Consolidado — Projeção 2021–2030E (R$ MM)</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left">Métrica</th>
+          <th>1T21</th><th>1T22</th><th>1T23</th><th>1T24</th><th>1T25</th>
+          <th>1T26E</th><th>1T27E</th><th>1T28E</th><th>1T29E</th><th>1T30E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Receita Líquida</td>
+          <td>759</td><td>951</td><td>2.459</td><td>2.005</td><td>4.424</td>
+          <td>5.088</td><td>5.851</td><td>6.728</td><td>7.738</td><td>8.898</td>
+        </tr>
+        <tr>
+          <td>EBITDA</td>
+          <td>442</td><td>474</td><td>1.169</td><td>1.089</td><td>1.528</td>
+          <td>1.846</td><td>1.973</td><td>2.089</td><td>2.185</td><td>2.252</td>
+        </tr>
+        <tr>
+          <td>Margem EBITDA</td>
+          <td class="neg">58,2%</td><td>49,8%</td><td>47,5%</td><td>54,3%</td><td class="neg">34,5%</td>
+          <td>36,3%</td><td>33,7%</td><td>31,1%</td><td>28,2%</td><td class="neg">25,3%</td>
+        </tr>
+        <tr>
+          <td>Var. Receita YoY</td>
+          <td>—</td><td class="pos">+25,3%</td><td class="pos">+158,6%</td><td class="neg">-18,5%</td><td class="pos">+120,6%</td>
+          <td class="pos">+15,0%</td><td class="pos">+15,0%</td><td class="pos">+15,0%</td><td class="pos">+15,0%</td><td class="pos">+15,0%</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="footnote">Fonte: Grupo AGK / Galapagos Challenge · Projeções 1T26–1T30 baseadas em modelo financeiro interno.</div>
+  </div>
+
+  <!-- Model & Peers -->
+  <div class="g2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-title">Modelo R2W — Principais Ativos</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:10px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px">Complexos Principais</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8">
+            Complexo Parnaíba (MA)<br>
+            Complexo Sergipe (SE)<br>
+            UTE Azulão (AM)<br>
+            UTE Jaguatirica II (AM)
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:10px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:6px">Diversificação</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.8">
+            UTE Itaqui (MA)<br>
+            UTE Pecém II (CE)<br>
+            Presença: MA·SE·AM·CE·ES·BA<br>
+            ~7,2 GW capacidade total
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:8px;background:var(--green-dim);border:1px solid #065f46;border-radius:3px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--green)">▶ TESE</div>
+        <div style="font-size:10px;color:#6ee7b7;margin-top:3px">Modelo integrado Rock-to-Wire (R2W) aumenta previsibilidade de fluxo de caixa e controle de margens ao longo de toda a cadeia produtiva.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Comparativo de Pares — EV/EBITDA Forward</div>
+      <table>
+        <thead>
+          <tr><th style="text-align:left">Empresa</th><th>Ticker</th><th>Múltiplo</th><th>Perfil</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Engie Brasil</td><td>EGIE3</td><td>9,3x</td><td><span class="chip chip-g">Alta visib.</span></td></tr>
+          <tr><td>Eletrobras</td><td>ELET3</td><td>8,5x</td><td><span class="chip chip-a">Turnaround</span></td></tr>
+          <tr><td>Auren Energia</td><td>AURE3</td><td>7,5x</td><td><span class="chip chip-b">Renováveis</span></td></tr>
+          <tr style="background:var(--blue-dim)"><td><b>Eneva (implícito)</b></td><td><b>ENEV3</b></td><td><b class="pos">12,1x</b></td><td><span class="chip chip-b">R2W+Contr.</span></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;padding:8px;background:var(--blue-dim);border:1px solid #1e40af;border-radius:3px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--blue)">▶ VALUATION</div>
+        <div style="font-size:10px;color:#93c5fd;margin-top:3px">Prêmio de múltiplo justificado pelo modelo integrado, previsibilidade contratual (PPAs) e crescimento estrutural de receita 11x no período.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /overview -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 2 — CASH FLOW
+══════════════════════════════════════════════ -->
+<div id="page-cashflow" class="page">
+
+  <div class="sec-hdr">ENEVA S.A. — Dinâmica de Geração de Caixa e Intensidade de Capital · 2021–2030E</div>
+
+  <!-- KPIs FCF -->
+  <div class="kpi-strip">
+    <div class="kpi green">
+      <div class="kpi-lbl">CFO 2030E</div>
+      <div class="kpi-val">R$2,56bi</div>
+      <div class="kpi-sub">vs R$629mm em 2021</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-lbl">CAPEX Pico</div>
+      <div class="kpi-val">(R$2,31bi)</div>
+      <div class="kpi-sub neg">2022 · growth-driven</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-lbl">FCL 2022</div>
+      <div class="kpi-val">(R$2,06bi)</div>
+      <div class="kpi-sub neg">Pior ano do ciclo</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-lbl">FCL 2030E</div>
+      <div class="kpi-val">R$812mm</div>
+      <div class="kpi-sub">Normalização gradual</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-lbl">Caixa Final 2030E</div>
+      <div class="kpi-val">R$4,55bi</div>
+      <div class="kpi-sub">Conforto estrutural</div>
+    </div>
+  </div>
+
+  <!-- CFO/CAPEX/FCL Chart -->
+  <div class="g21" style="margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">FCL · CFO · CAPEX (R$ MM)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartCFO"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Evolução do Caixa Final (R$ MM)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartCash"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full cash flow table -->
+  <div class="card">
+    <div class="card-title">Cash Flow Bridge Completo — 2021–2030E (R$ MM)</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left;min-width:140px">Linha</th>
+          <th>1T21</th><th>1T22</th><th>1T23</th><th>1T24</th><th>1T25</th>
+          <th>1T26E</th><th>1T27E</th><th>1T28E</th><th>1T29E</th><th>1T30E</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:var(--bg2)">
+          <td><b>EBITDA</b></td>
+          <td class="pos">442</td><td class="pos">474</td><td class="pos">1.169</td><td class="pos">1.089</td><td class="pos">1.528</td>
+          <td class="pos">1.757</td><td class="pos">2.021</td><td class="pos">2.324</td><td class="pos">2.672</td><td class="pos">3.073</td>
+        </tr>
+        <tr>
+          <td>Δ Capital de Giro</td>
+          <td class="pos">265</td><td class="neg">(194)</td><td class="neg">(353)</td><td class="pos">52</td><td class="neg">(395)</td>
+          <td class="neg">(80)</td><td class="neg">(95)</td><td class="neg">(110)</td><td class="neg">(130)</td><td class="neg">(150)</td>
+        </tr>
+        <tr>
+          <td>Impostos</td>
+          <td class="neg">(20)</td><td class="neg">(14)</td><td class="neg">(138)</td><td class="neg">(46)</td><td class="neg">(99)</td>
+          <td class="neg">(180)</td><td class="neg">(210)</td><td class="neg">(245)</td><td class="neg">(285)</td><td class="neg">(330)</td>
+        </tr>
+        <tr>
+          <td>Outros</td>
+          <td class="neg">(58)</td><td class="neg">(9)</td><td class="neg">(104)</td><td class="pos">9</td><td class="neg">(15)</td>
+          <td class="neg">(18)</td><td class="neg">(20)</td><td class="neg">(23)</td><td class="neg">(27)</td><td class="neg">(31)</td>
+        </tr>
+        <tr class="foot">
+          <td>CFO</td>
+          <td class="pos">629</td><td class="pos">257</td><td class="pos">574</td><td class="pos">1.105</td><td class="pos">1.018</td>
+          <td class="pos">1.479</td><td class="pos">1.696</td><td class="pos">1.946</td><td class="pos">2.230</td><td class="pos">2.562</td>
+        </tr>
+        <tr>
+          <td>CAPEX</td>
+          <td class="neg">(443)</td><td class="neg">(2.314)</td><td class="neg">(341)</td><td class="neg">(602)</td><td class="neg">(916)</td>
+          <td class="neg">(1.000)</td><td class="neg">(1.150)</td><td class="neg">(1.320)</td><td class="neg">(1.520)</td><td class="neg">(1.750)</td>
+        </tr>
+        <tr class="foot">
+          <td>FCL</td>
+          <td class="pos">186</td><td class="neg">(2.057)</td><td class="pos">233</td><td class="pos">503</td><td class="pos">102</td>
+          <td class="pos">479</td><td class="pos">546</td><td class="pos">626</td><td class="pos">710</td><td class="pos">812</td>
+        </tr>
+        <tr>
+          <td>Captação</td>
+          <td>160</td><td>1.699</td><td>31</td><td>38</td><td class="pos">1.794</td>
+          <td>500</td><td>300</td><td>200</td><td>100</td><td>—</td>
+        </tr>
+        <tr>
+          <td>Amortização Principal</td>
+          <td class="neg">(4)</td><td class="neg">(11)</td><td class="neg">(26)</td><td class="neg">(76)</td><td class="neg">(234)</td>
+          <td class="neg">(300)</td><td class="neg">(400)</td><td class="neg">(500)</td><td class="neg">(600)</td><td class="neg">(700)</td>
+        </tr>
+        <tr>
+          <td>Juros</td>
+          <td class="neg">(45)</td><td class="neg">(52)</td><td class="neg">(317)</td><td class="neg">(480)</td><td class="neg">(384)</td>
+          <td class="neg">(350)</td><td class="neg">(320)</td><td class="neg">(290)</td><td class="neg">(260)</td><td class="neg">(230)</td>
+        </tr>
+        <tr>
+          <td>Caixa Final</td>
+          <td class="neg">(934)</td><td class="neg">(934)</td><td>344</td><td>2.388</td><td class="pos">4.766</td>
+          <td class="pos">4.945</td><td class="pos">4.951</td><td class="pos">4.887</td><td class="pos">4.747</td><td class="pos">4.549</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="footnote">Nota: Negativos em parênteses. Projeções 1T26–1T30 baseadas no modelo do Grupo AGK.</div>
+  </div>
+
+  <!-- 4 insights -->
+  <div class="g2" style="margin-top:16px">
+    <div class="card">
+      <div class="card-title">Leituras do Cash Flow Bridge</div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="risk-item">
+          <div class="risk-icon" style="background:var(--blue-dim);font-size:12px">①</div>
+          <div class="risk-body">
+            <div class="risk-title" style="color:var(--blue)">Escala operacional com crescimento estrutural</div>
+            <div class="risk-desc">EBITDA 442→3.073 | CFO 629→2.562 — expansão consistente da geração operacional recorrente.</div>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon" style="background:var(--amber-dim);font-size:12px">②</div>
+          <div class="risk-body">
+            <div class="risk-title" style="color:var(--amber)">Modelo intensivo em capital (growth-driven CAPEX)</div>
+            <div class="risk-desc">CAPEX pico -2.314 (2022), normaliza para ~-1.750 em 2030. Crescimento ancorado em expansão de base de ativos.</div>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon" style="background:var(--red-dim);font-size:12px">③</div>
+          <div class="risk-body">
+            <div class="risk-title" style="color:var(--red)">Conversão de caixa cíclica</div>
+            <div class="risk-desc">FCF: -2.057 (2022) → ~+812 (2030). Forte volatilidade no curto prazo com recuperação gradual dependente do ciclo de investimento.</div>
+          </div>
+        </div>
+        <div class="risk-item">
+          <div class="risk-icon" style="background:var(--green-dim);font-size:12px">④</div>
+          <div class="risk-body">
+            <div class="risk-title" style="color:var(--green)">Funding como variável estrutural</div>
+            <div class="risk-desc">Captações relevantes recorrentes (ex: R$1,79bi em 2025). Estrutura de capital dependente de acesso contínuo ao mercado de dívida.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Mismatch de Duration — Ativo vs Passivo</div>
+      <div style="margin:8px 0 16px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:6px">Duration Ativos/CAPEX</div>
+        <div style="height:22px;background:var(--blue);border-radius:2px;width:100%;display:flex;align-items:center;padding:0 10px">
+          <span style="font-family:var(--mono);font-size:10px;color:#fff;font-weight:600">25 anos</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin:10px 0 6px">Duration Dívida</div>
+        <div style="height:22px;background:var(--red);border-radius:2px;width:24%;display:flex;align-items:center;padding:0 10px">
+          <span style="font-family:var(--mono);font-size:10px;color:#fff;font-weight:600">6 anos</span>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px">→ Gap de 19 anos → risco de rolagem estrutural</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:4px">Caixa Final 2030E</div>
+          <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text1)">R$ 4.950MM</div>
+        </div>
+        <div style="background:var(--green-dim);border:1px solid #065f46;border-radius:3px;padding:10px;text-align:center">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--green);margin-bottom:4px">Status de Liquidez</div>
+          <div style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--green)">CONFORTO<br>ESTRUTURAL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /cashflow -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 3 — VALUATION
+══════════════════════════════════════════════ -->
+<div id="page-valuation" class="page">
+
+  <div class="sec-hdr">ENEVA S.A. — DCF Valuation & WACC · Grupo AGK</div>
+
+  <!-- Val summary -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
+    <div class="val-box" style="border-left:3px solid var(--blue)">
+      <div class="val-label">Enterprise Value (EV)</div>
+      <div class="val-num">R$78,9bi</div>
+      <div class="val-sub">DCF base case</div>
+    </div>
+    <div class="val-box" style="border-left:3px solid var(--red)">
+      <div class="val-label">Dívida Líquida (4T25)</div>
+      <div class="val-num">(R$16,9bi)</div>
+      <div class="val-sub">Bridge EV→Equity</div>
+    </div>
+    <div class="val-box" style="border-left:3px solid var(--green)">
+      <div class="val-label">Equity Value</div>
+      <div class="val-num">R$61,9bi</div>
+      <div class="val-sub">EV menos dívida líq.</div>
+    </div>
+    <div class="val-box" style="border-left:3px solid var(--amber)">
+      <div class="val-label">Preço-Alvo Implícito</div>
+      <div class="val-num">R$39,20</div>
+      <div class="val-sub">por ação</div>
+    </div>
+    <div class="val-box" style="border-left:3px solid var(--green);background:var(--green-dim)">
+      <div class="val-label">Upside vs Cotação</div>
+      <div class="upside">+43,7%</div>
+      <div class="val-sub" style="color:var(--green)">Recomendação: COMPRA</div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <!-- WACC -->
+    <div class="card">
+      <div class="card-title">Composição do WACC (11,68%)</div>
+      <div class="wacc-tbl">
+        <div class="wacc-row">
+          <span class="wacc-key">Risk Free (Brasil)</span>
+          <span class="wacc-desc">NTN-B longa</span>
+          <span class="wacc-val" style="color:var(--text2)">10,50%</span>
+        </div>
+        <div class="wacc-row">
+          <span class="wacc-key">Beta Alavancado</span>
+          <span class="wacc-desc">Risco sistêmico utilities</span>
+          <span class="wacc-val" style="color:var(--text2)">0,90x</span>
+        </div>
+        <div class="wacc-row">
+          <span class="wacc-key">Equity Risk Premium</span>
+          <span class="wacc-desc">Prêmio de risco de mercado</span>
+          <span class="wacc-val" style="color:var(--text2)">5,50%</span>
+        </div>
+        <div class="wacc-row" style="border-top:1px solid var(--border2)">
+          <span class="wacc-key" style="color:var(--blue)">Cost of Equity (Ke)</span>
+          <span class="wacc-desc">Retorno exigido acionistas</span>
+          <span class="wacc-val" style="color:var(--blue)">15,45%</span>
+        </div>
+        <div class="wacc-row">
+          <span class="wacc-key">Cost of Debt (Kd)</span>
+          <span class="wacc-desc">Custo nominal da dívida</span>
+          <span class="wacc-val" style="color:var(--text2)">11,50%</span>
+        </div>
+        <div class="wacc-row">
+          <span class="wacc-key">After-tax Cost of Debt</span>
+          <span class="wacc-desc">Benefício fiscal 34%</span>
+          <span class="wacc-val" style="color:var(--text2)">7,59%</span>
+        </div>
+        <div class="wacc-row" style="background:var(--blue-dim);padding:8px 8px;border-radius:3px;border:none">
+          <span class="wacc-key" style="color:var(--blue);font-weight:600;font-size:12px">WACC</span>
+          <span class="wacc-desc" style="color:#93c5fd">Taxa de desconto ponderada</span>
+          <span class="wacc-val" style="color:var(--blue);font-size:16px">11,68%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sensitivity -->
+    <div class="card">
+      <div class="card-title">Análise de Sensibilidade — Preço-Alvo (WACC × g)</div>
+      <div style="overflow-x:auto">
+        <div class="stress-grid" style="grid-template-columns:auto repeat(5,1fr)">
+          <div class="sg-cell hdr">WACC \ g</div>
+          <div class="sg-cell hdr">2,5%</div>
+          <div class="sg-cell hdr">3,0%</div>
+          <div class="sg-cell hdr">3,5%</div>
+          <div class="sg-cell hdr">4,0%</div>
+          <div class="sg-cell hdr">4,5%</div>
+
+          <div class="sg-cell row-hdr">10,68%</div>
+          <div class="sg-cell">41,26</div><div class="sg-cell">43,74</div><div class="sg-cell">46,58</div><div class="sg-cell">49,83</div><div class="sg-cell">53,62</div>
+
+          <div class="sg-cell row-hdr">11,18%</div>
+          <div class="sg-cell">38,06</div><div class="sg-cell">40,22</div><div class="sg-cell">42,65</div><div class="sg-cell">45,42</div><div class="sg-cell">48,60</div>
+
+          <div class="sg-cell row-hdr" style="color:var(--blue)">11,68% ★</div>
+          <div class="sg-cell">35,22</div><div class="sg-cell">37,10</div><div class="sg-cell target">R$39,20</div><div class="sg-cell">41,58</div><div class="sg-cell">44,29</div>
+
+          <div class="sg-cell row-hdr">12,18%</div>
+          <div class="sg-cell">32,68</div><div class="sg-cell">34,33</div><div class="sg-cell">36,16</div><div class="sg-cell">38,22</div><div class="sg-cell">40,54</div>
+
+          <div class="sg-cell row-hdr">12,68%</div>
+          <div class="sg-cell stress">30,39</div><div class="sg-cell stress">31,84</div><div class="sg-cell stress">33,45</div><div class="sg-cell stress">35,24</div><div class="sg-cell">37,25</div>
+        </div>
+      </div>
+      <div class="footnote" style="margin-top:10px">★ = cenário base. Célula azul = preço-alvo implícito R$39,20. Vermelho = stress (WACC ≥ 12,18%).</div>
+    </div>
+  </div>
+
+  <!-- Stress scenarios -->
+  <div class="card">
+    <div class="card-title">Cenários de Stress — Impacto no Valor</div>
+    <table>
+      <thead>
+        <tr>
+          <th style="text-align:left">Variável</th>
+          <th>Cenário Base</th>
+          <th>Cenário Stress</th>
+          <th>Impacto no Valor</th>
+          <th>Severidade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Spread de Crédito</td>
+          <td>160 bps</td>
+          <td class="neg">360 bps (+200bps)</td>
+          <td class="neg">WACC → 12,72%</td>
+          <td><span class="chip chip-r">Alto</span></td>
+        </tr>
+        <tr>
+          <td>CAPEX Anual</td>
+          <td>R$ 1,35bi (médio)</td>
+          <td class="neg">R$ 1,55bi (+15%)</td>
+          <td class="neg">FCL anual -R$500MM</td>
+          <td><span class="chip chip-a">Médio</span></td>
+        </tr>
+        <tr>
+          <td>Preço-Alvo (stress)</td>
+          <td class="pos">R$ 39,20</td>
+          <td class="neg">R$ 30,24</td>
+          <td class="neg">Queda de 22,8%</td>
+          <td><span class="chip chip-r">Alto</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Valuation bridge -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">EV → Equity Bridge (R$ MM)</div>
+    <div style="max-width:400px">
+      <div class="br-row"><span class="br-key">Enterprise Value (EV)</span><span class="br-val pos">+ 78.895</span></div>
+      <div class="br-row"><span class="br-key">(-) Dívida Bruta</span><span class="br-val neg">— estimado</span></div>
+      <div class="br-row"><span class="br-key">(+) Caixa e Equivalentes</span><span class="br-val pos">— estimado</span></div>
+      <div class="br-row"><span class="br-key">Dívida Líquida (4T25)</span><span class="br-val neg">(16.955)</span></div>
+      <div class="br-row" style="border-top:2px solid var(--blue);background:var(--blue-dim);padding:8px;border-radius:3px">
+        <span class="br-key" style="color:var(--blue);font-weight:600">Equity Value</span>
+        <span class="br-val" style="color:var(--blue);font-size:14px;font-weight:700">61.940</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /valuation -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 4 — RISCOS
+══════════════════════════════════════════════ -->
+<div id="page-risco" class="page">
+
+  <div class="sec-hdr">ENEVA S.A. — Riscos Estruturais e Análise de Sensibilidade</div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Riscos Estruturais — Matriz</div>
+      <div class="risk-item">
+        <div class="risk-icon hi">⚡</div>
+        <div class="risk-body">
+          <div class="risk-title">Sensibilidade ao custo de funding</div>
+          <div class="risk-desc">CAPEX recorrente (~R$1,75bi em 2030) implica WACC estruturalmente relevante. Pequenas variações em juros/spreads têm impacto material no valor presente dos fluxos de caixa. <span class="chip chip-r">Crítico</span></div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon hi">🔄</div>
+        <div class="risk-body">
+          <div class="risk-title">Risco de refinanciamento (liquidity windows)</div>
+          <div class="risk-desc">Dependência de captações relevantes (ex: R$1,79bi em 2025). Exposição a fechamento de mercado ou aumento de prêmio de risco pode forçar uso do caixa acumulado. <span class="chip chip-r">Alto</span></div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon med">⏱</div>
+        <div class="risk-body">
+          <div class="risk-title">Mismatch de duration (ativo vs passivo)</div>
+          <div class="risk-desc">Ativos com horizonte de 15–20 anos vs. estrutura de dívida potencialmente mais curta (duration ~6 anos). Gera dependência de rolagem e renegociação contínua de passivos. <span class="chip chip-a">Médio</span></div>
+        </div>
+      </div>
+      <div class="risk-item">
+        <div class="risk-icon med">📉</div>
+        <div class="risk-body">
+          <div class="risk-title">Descompasso entre EBITDA e CAPEX</div>
+          <div class="risk-desc">Geração operacional cresce com defasagem vs. desembolso imediato de investimentos. Pressão temporária sobre alavancagem (Dívida Líquida / EBITDA) e covenants. <span class="chip chip-a">Médio</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Evolução CAPEX vs EBITDA (R$ MM)</div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chartCapexEbitda"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Dívida Líquida / EBITDA — Ciclo de Alavancagem</div>
+        <div class="chart-wrap" style="height:150px">
+          <canvas id="chartLeverage"></canvas>
+        </div>
+        <div class="footnote" style="margin-top:6px">Estimado com base no cash flow bridge do Grupo AGK.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /risco -->
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE 5 — DEBÊNTURE
+══════════════════════════════════════════════ -->
+<div id="page-debenture" class="page">
+
+  <div class="sec-hdr">ENEVA S.A. — Solução de Capital · Debênture de Infraestrutura (Lei 12.431)</div>
+
+  <div class="kpi-strip">
+    <div class="kpi blue">
+      <div class="kpi-lbl">Prazo da Emissão</div>
+      <div class="kpi-val">20–30a</div>
+      <div class="kpi-sub">Alinhado à duration dos ativos</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-lbl">Carência</div>
+      <div class="kpi-val">5 anos</div>
+      <div class="kpi-sub">Compatível com ramp-up</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-lbl">Indexação</div>
+      <div class="kpi-val">IPCA+</div>
+      <div class="kpi-sub">Alinhado aos PPAs</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-lbl">Uso — Refinanciamento</div>
+      <div class="kpi-val">~60%</div>
+      <div class="kpi-sub">Dívidas 2025–2027</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-lbl">Uso — Investimento</div>
+      <div class="kpi-val">~40%</div>
+      <div class="kpi-sub">Geração distr. + solar</div>
+    </div>
+  </div>
+
+  <div class="g12" style="margin-bottom:16px">
+    <!-- Context / Problem / Solution -->
+    <div class="card">
+      <div class="card-title">Contexto · Problema · Solução</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:10px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:5px">Contexto</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.7">
+            CAPEX 2025–2030: R$1,0–1,75bi/ano<br>
+            EBITDA 2030: ~R$3,1bi (vs R$442mm em 2021)<br>
+            FCL positivo a partir de 2025: ~R$100–800mm/ano
+          </div>
+        </div>
+        <div style="background:var(--red-dim);border:1px solid #7f1d1d;border-radius:3px;padding:10px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:5px">Problema</div>
+          <div style="font-size:11px;color:#fca5a5;line-height:1.7">
+            Descasamento entre investimentos de longo prazo e dívida de médio prazo<br>
+            Pressão de liquidez no ciclo 2025–2027 com concentração de vencimentos<br>
+            Amortizações antecipadas reduzem eficiência do caixa no período de expansão
+          </div>
+        </div>
+        <div style="background:var(--green-dim);border:1px solid #065f46;border-radius:3px;padding:10px">
+          <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:5px">Solução — Lei 12.431</div>
+          <div style="font-size:11px;color:#6ee7b7;line-height:1.7">
+            Prazo longo (20–30 anos) · IPCA + spread<br>
+            Carência de 5 anos · Alinhado às receitas de energia (PPAs)<br>
+            Reduz risco de refinanciamento e melhora previsibilidade financeira
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing chart + tese -->
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">Pricing — Curva de Duration Proposta vs Dívida Atual</div>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chartDuration"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Tese de Crédito</div>
+        <div style="padding:10px;background:var(--blue-dim);border:1px solid #1e40af;border-radius:3px;font-size:11px;color:#93c5fd;line-height:1.7">
+          A estrutura reduz o risco de refinanciamento ao alongar o passivo e alinhar melhor o prazo da dívida ao ciclo dos ativos, diminuindo a volatilidade do fluxo de caixa e melhorando a previsibilidade financeira da companhia para o período de expansão 2025–2030.
+        </div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:3px;padding:8px;text-align:center">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--text3)">Duration Atual</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--red)">~6 anos</div>
+          </div>
+          <div style="background:var(--green-dim);border:1px solid #065f46;border-radius:3px;padding:8px;text-align:center">
+            <div style="font-family:var(--mono);font-size:9px;color:var(--green)">Duration Proposta</div>
+            <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">20–30 anos</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Link -->
+  <div class="card">
+    <div class="card-title">Referências — Grupo AGK · Galapagos Challenge Program</div>
+    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:3px">Pricing de Emissão — Site do Grupo</div>
+        <a href="https://sites.google.com/view/gustavo-cavalheiro-challange/in%C3%ADcio" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--blue);text-decoration:none">
+          sites.google.com/view/gustavo-cavalheiro-challange ↗
+        </a>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:3px">Contatos</div>
+        <div style="font-size:10px;color:var(--text2);line-height:1.8">
+          Adrian Raposo · contate.raposo@gmail.com<br>
+          Gustavo Cavalheiro · gustavovences01@gmail.com<br>
+          Kauê Balbino · kauewallacy46@gmail.com
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /debenture -->
+
+</div><!-- /shell -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const years  = ['1T21','1T22','1T23','1T24','1T25','1T26E','1T27E','1T28E','1T29E','1T30E'];
+const receita= [759,951,2459,2005,4424,5088,5851,6728,7738,8898];
+const ebitda = [442,474,1169,1089,1528,1846,1973,2089,2185,2252];
+const margin = [58.2,49.8,47.5,54.3,34.5,36.3,33.7,31.1,28.2,25.3];
+const cfo    = [629,257,574,1105,1018,1479,1696,1946,2230,2562];
+const capex  = [-443,-2314,-341,-602,-916,-1000,-1150,-1320,-1520,-1750];
+const fcl    = [186,-2057,233,503,102,479,546,626,710,812];
+const cash   = [-934,-934,344,2388,4766,4945,4951,4887,4747,4549];
+
+const CHART_DEFAULTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { labels: { color: '#4a5568', font: { family: "'IBM Plex Mono'", size: 10 }, boxWidth: 12 } } },
+  scales: {
+    x: { ticks: { color: '#4a5568', font: { family: "'IBM Plex Mono'", size: 9 } }, grid: { color: '#111520' } },
+    y: { ticks: { color: '#4a5568', font: { family: "'IBM Plex Mono'", size: 9 } }, grid: { color: '#111520' } }
+  }
+};
+
+// Chart 1 — Rev + EBITDA
+new Chart(document.getElementById('chartRevEbitda'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Receita Líquida', data: receita, backgroundColor: 'rgba(59,130,246,0.25)', borderColor: '#3b82f6', borderWidth: 1 },
+      { label: 'EBITDA', data: ebitda, backgroundColor: 'rgba(16,185,129,0.25)', borderColor: '#10b981', borderWidth: 1 }
+    ]
+  },
+  options: { ...CHART_DEFAULTS }
+});
+
+// Chart 2 — Margin
+new Chart(document.getElementById('chartMargin'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Margem EBITDA %', data: margin,
+      borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)',
+      borderWidth: 2, pointRadius: 3, fill: true, tension: 0.3
+    }]
+  },
+  options: {
+    ...CHART_DEFAULTS,
+    scales: {
+      ...CHART_DEFAULTS.scales,
+      y: { ...CHART_DEFAULTS.scales.y, ticks: { ...CHART_DEFAULTS.scales.y.ticks, callback: v => v+'%' } }
+    }
+  }
+});
+
+// Chart 3 — CFO/CAPEX/FCL
+new Chart(document.getElementById('chartCFO'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'CFO', data: cfo, backgroundColor: 'rgba(16,185,129,0.3)', borderColor: '#10b981', borderWidth: 1 },
+      { label: 'CAPEX', data: capex, backgroundColor: 'rgba(239,68,68,0.3)', borderColor: '#ef4444', borderWidth: 1 },
+      { type: 'line', label: 'FCL', data: fcl, borderColor: '#3b82f6', borderWidth: 2, pointRadius: 3, fill: false, tension: 0.2 }
+    ]
+  },
+  options: { ...CHART_DEFAULTS }
+});
+
+// Chart 4 — Cash
+new Chart(document.getElementById('chartCash'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Caixa Final', data: cash,
+      borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.08)',
+      borderWidth: 2, pointRadius: 3, fill: true, tension: 0.3
+    }]
+  },
+  options: { ...CHART_DEFAULTS }
+});
+
+// Chart 5 — CAPEX vs EBITDA
+new Chart(document.getElementById('chartCapexEbitda'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'EBITDA', data: ebitda, borderColor: '#10b981', borderWidth: 2, pointRadius: 2, fill: false, tension: 0.3 },
+      { label: 'CAPEX (abs)', data: capex.map(v=>Math.abs(v)), borderColor: '#ef4444', borderWidth: 2, pointRadius: 2, fill: false, borderDash: [4,3], tension: 0.3 }
+    ]
+  },
+  options: { ...CHART_DEFAULTS }
+});
+
+// Chart 6 — Leverage
+const leverage = [2.1, 8.4, 3.2, 2.8, 4.1, 3.6, 3.0, 2.5, 2.0, 1.6];
+new Chart(document.getElementById('chartLeverage'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Dívida Líq./EBITDA', data: leverage,
+      backgroundColor: leverage.map(v => v > 4 ? 'rgba(239,68,68,0.5)' : v > 3 ? 'rgba(245,158,11,0.5)' : 'rgba(16,185,129,0.5)'),
+      borderColor: leverage.map(v => v > 4 ? '#ef4444' : v > 3 ? '#f59e0b' : '#10b981'),
+      borderWidth: 1
+    }]
+  },
+  options: { ...CHART_DEFAULTS, scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, ticks: { ...CHART_DEFAULTS.scales.y.ticks, callback: v => v+'x' } } } }
+});
+
+// Chart 7 — Duration bar
+new Chart(document.getElementById('chartDuration'), {
+  type: 'bar',
+  data: {
+    labels: ['Dívida Atual','Debênture Proposta (mín)','Debênture Proposta (máx)','Duration Ativo/CAPEX'],
+    datasets: [{
+      label: 'Anos',
+      data: [6, 20, 30, 25],
+      backgroundColor: ['rgba(239,68,68,0.4)','rgba(59,130,246,0.4)','rgba(16,185,129,0.4)','rgba(245,158,11,0.4)'],
+      borderColor: ['#ef4444','#3b82f6','#10b981','#f59e0b'],
+      borderWidth: 1
+    }]
+  },
+  options: {
+    ...CHART_DEFAULTS, indexAxis: 'y',
+    scales: { ...CHART_DEFAULTS.scales, x: { ...CHART_DEFAULTS.scales.x, ticks: { ...CHART_DEFAULTS.scales.x.ticks, callback: v => v+'a' } } }
+  }
+});
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+function switchPage(name, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
